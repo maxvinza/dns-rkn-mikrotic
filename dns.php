@@ -43,7 +43,6 @@ function razbor_net($cur_ip_adrr, $ip_array){// true  - заблокирован
     $flag = false;
     foreach($ip_array as &$cur_cidr)
     {
-	print "ban ip ".$cur_cidr;
 	if ((ipCIDRcheck($cur_ip_adrr, $cur_cidr)) == true) $flag = true;  
     }
     return $flag;
