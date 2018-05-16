@@ -3,8 +3,11 @@
 require('routeros_api.class.php');
 
 $API = new routeros_api();
-
 $API->debug = false;
+//Запрашиваем сети в блоке РКН
+exec("curl -s https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv | cut -d ';' -f 1 |  tr '|' '\n' | grep '/' | tr -d ' ' | sort -k1 -n > ban_nets.txt ");
+$ip_array = file('ban_nets.txt');
+
 
 if ($API->connect('192.168.1.66', 'exec00t', '123tests')){
     $ARRAY = $API->comm('/ip/dns/cache/print');
@@ -14,7 +17,7 @@ if ($API->connect('192.168.1.66', 'exec00t', '123tests')){
 	$name = $value['name'];
 	$addr = $value['address'];
 	$res_arr[$name][]=$addr;
-	$state_ip[$addr] = razbor_net($value['address']);
+	$state_ip[$addr] = razbor_net($value['address'], $ip_array);
     }
     foreach($res_arr as $key => $value){
 	$clear_ip = '';
@@ -23,103 +26,25 @@ if ($API->connect('192.168.1.66', 'exec00t', '123tests')){
 	    if($state_ip[$val] == false) $clear_ip = $val;
 	    else $toxic_net = true;
 	}
-	
-	if($toxic_net AND $clear_ip <> '')
+	if($toxic_net) print "toxic ".$key." - ".$val."\n";
+	if($toxic_net AND $clear_ip <> ''){
 	    $API->comm("/ip/dns/static/add", array(
         	"address" => $clear_ip,
         	"name" => $key,
 	    ));
-	print $key." - ".$val."\n";
+	    print "add ".$key." - ".$val."\n";
+	}
     }
-/*    
-    $API->comm("/ip/dns/static/add", array(
-          "name"    => "ya.ru",
-          "address" => "127.0.0.1",
-));*/
 }
 
 
 
-function razbor_net($vaddr){// true  - заблокирован
-    //массив СИДР чиста для проверки работоспособности
-    $ip_array = array(
-'13.125.0.0/16',
-'13.230.0.0/15',
-'13.56.0.0/14',
-'18.130.0.0/16',
-'18.144.0.0/16',
-'18.184.0.0/15',
-'18.194.0.0/15',
-'18.196.0.0/15',
-'18.204.0.0/14',
-'18.218.0.0/16',
-'18.236.0.0/15',
-'34.192.0.0/10',
-'34.240.0.0/13',
-'34.248.0.0/13',
-'35.156.0.0/14',
-'35.160.0.0/13',
-'35.176.0.0/15',
-'35.178.0.0/15',
-'35.180.0.0/16',
-'45.76.82.0/23',
-'46.101.128.0/17',
-'51.136.0.0/15',
-'51.15.0.0/16',
-'52.32.0.0/16',
-'52.56.0.0/16',
-'52.57.0.0/16',
-'52.58.0.0/15',
-'52.64.0.0/12',
-'54.144.0.0/12',
-'54.212.0.0/15',
-'54.228.0.0/15',
-'54.64.0.0/13',
-'64.137.0.0/17',
-'68.171.224.0/19',
-'74.82.64.0/19',
-'91.108.12.0/22',
-'91.108.16.0/22',
-'91.108.4.0/22',
-'91.108.56.0/22',
-'91.108.8.0/22',
-'94.177.224.0/21',
-'98.158.176.0/20',
-'103.246.200.0/22',
-'109.239.140.0/24',
-'128.199.0.0/16',
-'149.154.160.0/22',
-'149.154.164.0/22',
-'149.154.168.0/22',
-'149.154.172.0/22',
-'159.122.128.0/18',
-'159.203.0.0/16',
-'159.65.0.0/16',
-'159.89.0.0/16',
-'165.227.0.0/16',
-'167.99.0.0/16',
-'174.138.0.0/17',
-'176.67.169.0/24',
-'178.239.88.0/21',
-'178.63.0.0/16',
-'185.166.212.0/23',
-'185.229.227.0/24',
-'188.166.0.0/17',
-'195.154.0.0/17',
-'203.104.128.0/20',
-'203.104.144.0/21',
-'203.104.152.0/22',
-'206.189.0.0/16'
-    );
-    //текущий ИП-адрес посетителя
-    $cur_ip_adrr = $vaddr;
-    //ЦИКЛ проверки вхождения текущего ИП в СИДРы
+function razbor_net($cur_ip_adrr, $ip_array){// true  - заблокирован
     $flag = false;
-    foreach($ip_array as $cur_cidr)
+    foreach($ip_array as &$cur_cidr)
     {
-	if ((ipCIDRcheck($cur_ip_adrr, $cur_cidr)) == true) $flag = true;  //при первом вхождении установить флаг и выйти из цикла
-	else
-	{/*может потом что то допишу*/}
+	print "ban ip ".$cur_cidr;
+	if ((ipCIDRcheck($cur_ip_adrr, $cur_cidr)) == true) $flag = true;  
     }
     return $flag;
 }
