@@ -5,7 +5,6 @@ require('routeros_api.class.php');
 $API = new routeros_api();
 $API->debug = false;
 //Запрашиваем сети в блоке РКН
-exec("curl -s https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv | cut -d ';' -f 1 |  tr '|' '\n' | grep '/' | tr -d ' ' | sort -k1 -n > ban_nets.txt ");
 $ip_array = file('ban_nets.txt');
 
 
