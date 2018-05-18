@@ -7,7 +7,7 @@
 Пример:
 
 Сервер провайдера:
-
+```
 nslookup elb001-mtc-ag21.mtc.usw2.np.cy.s0.playstation.net
 Server: 192.168.1.1
 Address: 192.168.1.1#53
@@ -21,9 +21,9 @@ Name: elb001-mtc-ag21.mtc.usw2.np.cy.s0.playstation.net
 Address: 35.163.190.236
 Name: elb001-mtc-ag21.mtc.usw2.np.cy.s0.playstation.net
 Address: 34.211.105.107
-
+```
 Наш DNS:
-
+```
 nslookup elb001-mtc-ag21.mtc.usw2.np.cy.s0.playstation.net 192.168.1.66
 Server: 192.168.1.66
 Address: 192.168.1.66#53
@@ -31,7 +31,7 @@ Address: 192.168.1.66#53
 Non-authoritative answer:
 Name: elb001-mtc-ag21.mtc.usw2.np.cy.s0.playstation.net
 Address: 52.24.34.174
-
+```
 
 ##Установка и настройка:
 0) Понадобится микротик(можно использовать бесплатную версию микротиковской операционки, установив его на виртуалку) и виртуалка на которой будут крутиться скрипты с интерпритатором php.
